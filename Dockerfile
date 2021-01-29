@@ -16,10 +16,10 @@ RUN addgroup -g ${GID} pleroma \
     && adduser -h /pleroma -s /bin/sh -D -G pleroma -u ${UID} pleroma
 
 USER pleroma
+
 WORKDIR /pleroma
 
-RUN git clone -b develop https://git.pleroma.social/pleroma/pleroma.git /pleroma \
-    && git checkout ${PLEROMA_VER}
+RUN git clone -b ${PLEROMA_VER} https://git.pleroma.social/pleroma/pleroma.git /pleroma --depth=1
 
 COPY config/secret.exs /pleroma/config/prod.secret.exs
 
@@ -27,6 +27,9 @@ RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
     && mix compile
+
+# This is for installing soapbox, or some other frontends.
+# COPY instance/* /pleroma/priv/static/
 
 VOLUME /pleroma/uploads/
 
